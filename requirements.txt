@@ -1,0 +1,15 @@
+anthropic>=0.40.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# semantic graph traversal (optional but recommended; falls back to TF-IDF)
+sentence-transformers>=2.7.0
+scikit-learn>=1.3.0
+
+# offline TTS fallback (used if ELEVENLABS_API_KEY not set)
+pyttsx3>=2.90
+
+# YouTube upload
+google-api-python-client>=2.120.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
