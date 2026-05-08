@@ -25,6 +25,7 @@ dependencies = [
 
   # AI APIs
   "anthropic>=0.40",
+  "fal-client>=1.0",
 
   # Cloud
   "google-cloud-storage>=2.17",

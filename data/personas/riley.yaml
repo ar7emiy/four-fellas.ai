@@ -1,0 +1,27 @@
+name: riley
+niche: golf_lifestyle
+status: mvp_testing
+
+face:
+  base_prompt: >-
+    Portrait of a 26-year-old athletic American woman, dark blonde
+    shoulder-length straight hair, green eyes, light freckles, lightly tanned
+    skin, strong jawline, clean and polished appearance, photorealistic,
+    natural lighting, 8k
+  negative_prompt: >-
+    cartoon, anime, illustration, painting, drawing, unrealistic, deformed,
+    blurry, ugly, duplicate, watermark, text
+  candidate_count: 20
+  aspect_ratio: "9:16"
+
+pulid:
+  reference_strength: 0.8
+
+voice:
+  design_prompt: >-
+    A 26-year-old American woman. Warm, clear mid-range voice. Slight athletic
+    energy — confident but approachable. Not a broadcaster voice. Sounds like
+    she's talking to a friend at the 19th hole.
+  voice_id: null
+
+tone: "Warm, confident, slightly witty. Self-deprecating about golf game, proud of style."

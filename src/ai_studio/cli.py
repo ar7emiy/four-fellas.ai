@@ -7,6 +7,8 @@ and the verification steps in the plan) depends on.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import typer
 
 app = typer.Typer(
@@ -14,6 +16,30 @@ app = typer.Typer(
     help="AI Influencer Studio — persona-driven Instagram content pipeline.",
     no_args_is_help=True,
 )
+
+
+@app.command("generate-faces")
+def generate_faces(
+    persona: str = typer.Argument(..., help="Persona slug (e.g. 'riley')."),
+    count: int = typer.Option(0, help="Number of candidates. 0 = use persona default."),
+) -> None:
+    """Stage 1: generate candidate base faces via FLUX 2 Pro (fal.ai). No LoRA, no PuLID."""
+    from ai_studio.generation.image_clients.fal import generate_faces as _gen
+    from ai_studio.personas import Persona
+
+    p = Persona.load(persona)
+    n = count or p.face.candidate_count
+    output_dir = Path("data/outputs") / persona / "stage1_candidates"
+
+    typer.echo(f"Generating {n} candidate faces for '{persona}' → {output_dir}")
+    saved = _gen(
+        prompt=p.face.base_prompt,
+        count=n,
+        output_dir=output_dir,
+        aspect_ratio=p.face.aspect_ratio,
+        negative_prompt=p.face.negative_prompt,
+    )
+    typer.echo(f"✓ Saved {len(saved)} images to {output_dir}")
 
 
 @app.command()
