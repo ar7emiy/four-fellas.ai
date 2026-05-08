@@ -1,8 +1,42 @@
-.env
-output/
-*.pyc
+# Python
 __pycache__/
-client_secrets.json
-youtube_token.json
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Virtual envs
 .venv/
 venv/
+env/
+
+# Env files
+.env
+.env.local
+*.env
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Project-local data (gitignored per plan)
+data/reference/
+data/outputs/
+output/
+
+# Legacy (archived project tokens)
+client_secrets.json
+youtube_token.json
+*-credentials.json
+*.safetensors
+
+# OS
+.DS_Store
+Thumbs.db
