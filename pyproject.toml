@@ -1,0 +1,101 @@
+[project]
+name = "ai-influencer-studio"
+version = "0.1.0"
+description = "AI Instagram influencer pipeline: ComfyUI + Flux + LoRAs + Kling, with persona network coordination"
+requires-python = ">=3.11"
+readme = "README.md"
+
+dependencies = [
+  # CLI + config
+  "typer>=0.12",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.3",
+  "python-dotenv>=1.0",
+  "pyyaml>=6.0",
+  "structlog>=24.1",
+
+  # DB
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.2",
+
+  # HTTP / external APIs
+  "httpx>=0.27",
+  "tenacity>=8.3",
+
+  # AI APIs
+  "anthropic>=0.40",
+
+  # Cloud
+  "google-cloud-storage>=2.17",
+  "google-cloud-secret-manager>=2.20",
+
+  # Image / curation
+  "pillow>=10.3",
+  "numpy>=1.26",
+  "torch>=2.3",
+  "open-clip-torch>=2.24",
+  "insightface>=0.7",
+  "onnxruntime>=1.18",
+  "transformers>=4.41",
+
+  # GPU compute orchestration
+  "modal>=0.64",
+
+  # SME UI
+  "streamlit>=1.36",
+
+  # Misc
+  "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "pytest-postgresql>=6.0",
+  "respx>=0.21",
+  "responses>=0.25",
+  "ruff>=0.5",
+  "black>=24.4",
+  "mypy>=1.10",
+  "pre-commit>=3.7",
+  "types-pyyaml",
+]
+
+[project.scripts]
+studio = "ai_studio.cli:app"
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_studio"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "RUF", "SIM"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["src/ai_studio"]
+branch = true
