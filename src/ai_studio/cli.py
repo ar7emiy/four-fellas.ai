@@ -50,11 +50,89 @@ def init() -> None:
 
 @app.command("dataset-build")
 def dataset_build(
-    persona: str = typer.Option(..., help="Persona slug (e.g. 'golfer')."),
-    count: int = typer.Option(80, help="Candidate images to generate."),
+    persona: str = typer.Argument(..., help="Persona slug (e.g. 'riley')."),
+    workflow: Path = typer.Option(
+        Path("workflows/consistent_character_dataset.json"),
+        help="ComfyUI API-format workflow JSON.",
+        exists=True,
+    ),
+    count: int = typer.Option(80, help="Number of candidate images to generate."),
+    local: bool = typer.Option(False, help="Use local ComfyUI instead of Modal."),
 ) -> None:
-    """Phase 0: run consistent-character ComfyUI workflow on Modal to build a LoRA dataset."""
-    typer.echo(f"[stub] studio dataset-build --persona {persona} --count {count}")
+    """Phase 0: run consistent-character ComfyUI workflow (Modal or local) to build LoRA dataset.
+
+    Generates <count> candidate images via Flux.2 Klein + realism LoRA stack,
+    saves to data/outputs/<persona>/dataset_candidates/.
+    """
+    import json as _json
+
+    from ai_studio.generation.image_clients.comfyui_client import ComfyUIClient
+    from ai_studio.personas import Persona
+
+    p = Persona.load(persona)
+    output_dir = Path("data/outputs") / persona / "dataset_candidates"
+
+    raw = _json.loads(workflow.read_text())
+    wf = _inject_persona_prompt(raw, p.face.base_prompt, p.face.negative_prompt)
+
+    client = ComfyUIClient(local_url="http://localhost:8188" if local else None)
+
+    typer.echo(
+        f"Running dataset build for '{persona}' → {output_dir}\n"
+        f"  workflow: {workflow}\n"
+        f"  count: {count}\n"
+        f"  backend: {'local' if local else 'Modal L4'}"
+    )
+
+    all_saved: list[Path] = []
+    for i in range(count):
+        typer.echo(f"  [{i + 1}/{count}] generating...", nl=False)
+        saved = client.run_workflow(
+            workflow=wf,
+            output_dir=output_dir,
+            filename_prefix=f"candidate",
+        )
+        all_saved.extend(saved)
+        typer.echo(f" saved {[s.name for s in saved]}")
+
+    typer.echo(f"\n✓ {len(all_saved)} candidates saved to {output_dir}")
+
+
+def _inject_persona_prompt(
+    workflow: dict,
+    positive_prompt: str,
+    negative_prompt: str,
+) -> dict:
+    """Replace placeholder prompts in the workflow with the persona's prompts.
+
+    Looks for nodes with class_type 'CLIPTextEncode' whose text contains
+    the marker strings '{{POSITIVE_PROMPT}}' or '{{NEGATIVE_PROMPT}}'.
+    """
+    import copy
+
+    wf = copy.deepcopy(workflow)
+    for node in wf.values():
+        if node.get("class_type") != "CLIPTextEncode":
+            continue
+        text = node.get("inputs", {}).get("text", "")
+        if "{{POSITIVE_PROMPT}}" in text:
+            node["inputs"]["text"] = text.replace("{{POSITIVE_PROMPT}}", positive_prompt)
+        if "{{NEGATIVE_PROMPT}}" in text:
+            node["inputs"]["text"] = text.replace("{{NEGATIVE_PROMPT}}", negative_prompt)
+    return wf
+
+
+@app.command("upload-lora")
+def upload_lora(
+    lora_file: Path = typer.Argument(..., help="Path to .safetensors LoRA file.", exists=True),
+) -> None:
+    """Upload a LoRA .safetensors file to the Modal model volume."""
+    from ai_studio.generation.image_clients.comfyui_client import ComfyUIClient
+
+    client = ComfyUIClient()
+    typer.echo(f"Uploading {lora_file.name} ({lora_file.stat().st_size / 1e6:.1f} MB)...")
+    client.upload_lora(lora_file)
+    typer.echo("✓ Done. LoRA available in Modal ComfyUI.")
 
 
 @app.command()
