@@ -1,0 +1,48 @@
+# Phase 0: Dataset Generation + LoRA Training
+
+## Current Status
+- [x] Project scaffold + Modal ComfyUI pipeline wired
+- [x] Platform consolidation (Modal + Supabase only)
+- [ ] Download Civitai 2325916 workflow + edit for {{POSITIVE_PROMPT}} markers
+- [ ] Modal deployment + Flux.2 Klein model download
+- [ ] LoRA upload (InstaPic Ultrareal + Ultra Real Klein 9B)
+- [ ] Generate 80 candidates via `studio dataset-build riley --count 80`
+- [ ] SME cull: pick 35–40 best, move to `data/outputs/riley/culled/`
+- [ ] Train LoRA: `studio train riley --dataset data/outputs/riley/culled/`
+- [ ] Validate LoRA on holdout test images
+
+## Phase 1: Single-Persona End-to-End
+- [ ] Alembic migrations + SQLite schema
+- [ ] ComfyUI LoRA inference workflow
+- [ ] Curation stack (ArcFace, LAION aesthetic, Falconsai NSFW, CLIP alignment)
+- [ ] Streamlit review UI (pick winners from ranked candidates)
+- [ ] Caption writer (Claude Sonnet w/ prompt caching)
+- [ ] Instagram Graph API client (sandbox mode)
+- [ ] `studio run-once` orchestration
+- [ ] Unit tests
+
+## Phase 2: Multi-Persona Network
+- [ ] Train LoRAs for 4–5 girlfriends + 1–2 boyfriends
+- [ ] Calendar engine + activity templates
+- [ ] Cross-persona coordination logic
+- [ ] PuLID-Flux face swap workflow
+- [ ] Migrate DB to Supabase Postgres
+- [ ] Meta App Review submission
+- [ ] `studio generate-week` orchestration
+
+## Phase 3: Video + Automation
+- [ ] Kling video generation via fal.ai
+- [ ] Modal Cron for daily posting
+- [ ] Supabase Storage for images
+- [ ] B-roll authenticity mixing
+- [ ] LoRA drift detection + retraining
+- [ ] BigQuery engagement metrics
+- [ ] GCE migration evaluation
+
+## Backlog (Deferred)
+- Multi-platform (TikTok, Pinterest)
+- Caption A/B testing
+- Auto-tuning prompts based on engagement
+- Auto-DM responses
+- Web dashboard beyond Streamlit
+- Voice generation for video clips
