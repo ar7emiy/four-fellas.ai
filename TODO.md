@@ -6,17 +6,22 @@ Tracks the active work. Granular session-level todos go in PR descriptions; this
 
 Unblocks consistency for everything after. Without this, every "Riley" looks like a different woman.
 
+The CCDB workflow achieves dataset consistency via **reference image conditioning** (VAE-encode a reference photo → `ReferenceLatent`), not LoRAs. The realism LoRAs (InstaPic Ultrareal, Ultra Real Klein 9B) are pre-loaded here but used in Phase 1 inference, not dataset-build.
+
 - [x] Scaffold project + Modal ComfyUI pipeline wired (`infra/modal_app.py`, `comfyui_client.py`, `studio dataset-build`)
 - [x] Platform consolidation (Modal + Supabase, no GCP/Terraform)
-- [ ] Download Civitai 2325916 workflow → Save as API Format → replace `workflows/consistent_character_dataset.json`
-- [ ] Replace the two `CLIPTextEncode` node text values with `{{POSITIVE_PROMPT}}` and `{{NEGATIVE_PROMPT}}`
+- [x] Download Civitai 2325916 workflow → exported as API Format → saved as `workflows/consistent_character_dataset.json`
+- [ ] Fix workflow for Modal: add missing custom nodes (Comfyroll, comfyui-image-saver) to `infra/modal_app.py`; reconcile model paths (`FLUX.2/` subdir, `qwen_3_4b`, `flux2-vae`)
+- [ ] Fix workflow prompt injection: replace broken node 254 (`UNKNOWN`) with a plain `CLIPTextEncode` using `{{POSITIVE_PROMPT}}`
+- [ ] Copy reference image → `data/personas/riley/reference.jpeg`; add `reference_image` field to `riley.yaml`
+- [ ] Update `cli.py` to inject reference image path into workflow node 166 (`LoadImage`) and character name into nodes 238/239
 - [ ] One-time Modal setup: `modal deploy infra/modal_app.py` + `modal run infra/modal_app.py::download_models`
-- [ ] Upload realism LoRAs to Modal volume: InstaPic Ultrareal + Ultra Real Klein 9B (`studio upload-lora`)
+- [ ] Pre-load realism LoRAs to Modal volume for Phase 1: `studio upload-lora ultra_real_v4.safetensors --name instapic_ultrareal.safetensors` and `studio upload-lora V1_flux_klein.safetensors --name ultra_real_klein_9b.safetensors`
 - [ ] Generate 80 candidates: `studio dataset-build riley --count 80`
 - [ ] Manually cull 80 → 35–40 (move keepers to `data/outputs/riley/culled/`)
 - [ ] Implement `studio train` command — ai-toolkit on Modal L4
 - [ ] Train Riley's identity LoRA, push `.safetensors` to Modal volume
-- [ ] Holdout validation: 10 generations with LoRA loaded scoring ArcFace consistency > 0.62
+- [ ] Holdout validation: 10 generations with LoRA loaded, eyeball face consistency
 
 ## Phase 1 — Single-Persona Post, End-to-End
 
@@ -24,8 +29,8 @@ One image of Riley posted to a sandbox IG Business account, with her identity Lo
 
 - [ ] Alembic migrations + SQLite schema (personas, events, generations, candidate_scores, posts, audit_log)
 - [ ] Persona row + LoRA registry seeded from `data/personas/riley.yaml`
-- [ ] ComfyUI Flux + LoRA inference workflow (`workflows/flux_lora_inference.json`)
-- [ ] Prompt builder: activity YAML + persona → Flux prompt with LoRA tag
+- [ ] ComfyUI inference workflow (`workflows/flux_lora_inference.json`): Riley's identity LoRA + InstaPic Ultrareal + Ultra Real Klein 9B realism LoRAs stacked on Flux.2 Klein base
+- [ ] Prompt builder: activity YAML + persona → Flux prompt with LoRA trigger tag
 - [ ] `studio generate --persona riley --activity ...` writes 8 candidates + cost to DB
 - [ ] Curation stack: ArcFace face-consistency, LAION aesthetic, Falconsai NSFW, CLIP prompt-alignment, hand-quality
 - [ ] Composite score + auto-pass thresholds in `candidate_scores` table
