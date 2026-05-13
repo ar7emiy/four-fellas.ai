@@ -72,14 +72,28 @@ def dataset_build(
     p = Persona.load(persona)
     output_dir = Path("data/outputs") / persona / "dataset_candidates"
 
+    if not p.reference_image:
+        typer.echo(f"Error: persona '{persona}' has no reference_image in its YAML.", err=True)
+        raise typer.Exit(1)
+
+    ref_path = Path("data/personas") / p.reference_image
+    if not ref_path.exists():
+        typer.echo(f"Error: reference image not found: {ref_path}", err=True)
+        raise typer.Exit(1)
+
+    ref_filename = ref_path.name
+    ref_bytes = ref_path.read_bytes()
+
     raw = _json.loads(workflow.read_text())
     wf = _inject_persona_prompt(raw, p.face.base_prompt, p.face.negative_prompt)
+    wf = _inject_persona_runtime(wf, ref_filename, p.name.capitalize(), "")
 
     client = ComfyUIClient(local_url="http://localhost:8188" if local else None)
 
     typer.echo(
         f"Running dataset build for '{persona}' → {output_dir}\n"
         f"  workflow: {workflow}\n"
+        f"  reference: {ref_path}\n"
         f"  count: {count}\n"
         f"  backend: {'local' if local else 'Modal L4'}"
     )
@@ -90,7 +104,8 @@ def dataset_build(
         saved = client.run_workflow(
             workflow=wf,
             output_dir=output_dir,
-            filename_prefix=f"candidate",
+            filename_prefix="candidate",
+            input_images={ref_filename: ref_bytes},
         )
         all_saved.extend(saved)
         typer.echo(f" saved {[s.name for s in saved]}")
@@ -122,16 +137,42 @@ def _inject_persona_prompt(
     return wf
 
 
+def _inject_persona_runtime(
+    workflow: dict,
+    reference_image_filename: str,
+    first_name: str,
+    last_name: str,
+) -> dict:
+    """Inject runtime values into CCDB workflow nodes.
+
+    Node 166 (LoadImage): reference face filename.
+    Node 238 (PrimitiveString): character first name → output filename prefix.
+    Node 239 (PrimitiveString): character last name → output filename suffix.
+    """
+    import copy
+
+    wf = copy.deepcopy(workflow)
+    if "166" in wf:
+        wf["166"]["inputs"]["image"] = reference_image_filename
+    if "238" in wf:
+        wf["238"]["inputs"]["value"] = first_name
+    if "239" in wf:
+        wf["239"]["inputs"]["value"] = last_name
+    return wf
+
+
 @app.command("upload-lora")
 def upload_lora(
     lora_file: Path = typer.Argument(..., help="Path to .safetensors LoRA file.", exists=True),
+    name: str = typer.Option("", help="Destination filename in volume. Defaults to source filename."),
 ) -> None:
     """Upload a LoRA .safetensors file to the Modal model volume."""
     from ai_studio.generation.image_clients.comfyui_client import ComfyUIClient
 
     client = ComfyUIClient()
-    typer.echo(f"Uploading {lora_file.name} ({lora_file.stat().st_size / 1e6:.1f} MB)...")
-    client.upload_lora(lora_file)
+    dest = name or lora_file.name
+    typer.echo(f"Uploading {lora_file.name} → {dest} ({lora_file.stat().st_size / 1e6:.1f} MB)...")
+    client.upload_lora(lora_file, dest_name=dest or None)
     typer.echo("✓ Done. LoRA available in Modal ComfyUI.")
 
 
@@ -140,7 +181,7 @@ def train(
     persona: str = typer.Argument(..., help="Persona slug."),
     reference: str = typer.Option(..., help="Path to reference image dir."),
 ) -> None:
-    """Phase 0: train a LoRA via ai-toolkit on Modal L4. Uploads .safetensors to GCS."""
+    """Phase 0: train a LoRA via ai-toolkit on Modal L4. Uploads .safetensors to Modal volume."""
     typer.echo(f"[stub] studio train {persona} --reference {reference}")
 
 
@@ -185,7 +226,7 @@ def generate_week(
 
 @app.command("post-today")
 def post_today() -> None:
-    """Phase 3: scheduled daily posting entry (Cloud Scheduler target)."""
+    """Phase 3: scheduled daily posting entry (Modal Cron target)."""
     typer.echo("[stub] studio post-today")
 
 

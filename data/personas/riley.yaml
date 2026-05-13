@@ -1,6 +1,7 @@
 name: riley
 niche: golf_lifestyle
 status: mvp_testing
+reference_image: riley/reference.jpeg
 
 face:
   base_prompt: >-

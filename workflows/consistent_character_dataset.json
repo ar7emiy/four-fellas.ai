@@ -1,105 +1,322 @@
 {
-  "_README": [
-    "TEMPLATE — replace with the real workflow JSON downloaded from Civitai.",
-    "",
-    "HOW TO USE:",
-    "1. Download: Civitai 2325916 (SarcasticTOFU's Flux.2 Klein 4B GGUF CCDB)",
-    "   https://civitai.com/models/2325916",
-    "2. In ComfyUI: File → Load → pick the downloaded .json → Save (API Format)",
-    "   (API Format is different from the default Save — you need the node IDs)",
-    "3. Replace this file with that API-format JSON.",
-    "4. Find the two CLIPTextEncode nodes and replace their 'text' values with:",
-    "   - positive node: '{{POSITIVE_PROMPT}}'",
-    "   - negative node: '{{NEGATIVE_PROMPT}}'",
-    "   The CLI will inject the persona's prompts at runtime.",
-    "5. Find the LoRA loader nodes and set lora_name to:",
-    "   - 'instapic_ultrareal.safetensors' (strength 0.7) — realism / social media look",
-    "   - 'ultra_real_klein_9b.safetensors' (strength 0.4) — skin detail",
-    "   These must be uploaded first: studio upload-lora <path-to-file>",
-    "",
-    "FACE DETAILER:",
-    "The SarcasticTOFU workflow may not include a face detailer pass.",
-    "If you want the SRPO skin detailer, download it separately from:",
-    "  https://github.com/rik-python/Comfyu--Image-detailer-and-skin-detailer-workflows",
-    "and merge the final detailer nodes into this workflow.",
-    "",
-    "This placeholder keeps the CLI wired — it will fail until replaced."
-  ],
-  "1": {
-    "class_type": "CheckpointLoaderSimple",
+  "81": {
     "inputs": {
-      "ckpt_name": "flux2-klein-4b-Q8_0.gguf"
+      "model": [
+        "246",
+        0
+      ]
+    },
+    "class_type": "ModelPassThrough",
+    "_meta": {
+      "title": "ModelPass"
     }
   },
-  "2": {
-    "class_type": "CLIPTextEncode",
+  "123": {
+    "inputs": {
+      "vae_name": "FLUX.2/flux2-vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "145": {
+    "inputs": {
+      "samples": [
+        "261",
+        0
+      ],
+      "vae": [
+        "123",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "166": {
+    "inputs": {
+      "image": "Character Base.jpeg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Set Reference Image"
+    }
+  },
+  "228": {
+    "inputs": {
+      "UNKNOWN": true,
+      "images": [
+        "145",
+        0
+      ],
+      "path": [
+        "236",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "232": {
+    "inputs": {},
+    "_meta": {
+      "title": "Flux.2 Klein 4B Simple Consistent Character Dataset Builder"
+    }
+  },
+  "236": {
+    "inputs": {
+      "inputcount": 2,
+      "delimiter": "_",
+      "return_list": false,
+      "Update inputs": null,
+      "string_1": [
+        "238",
+        0
+      ],
+      "string_2": [
+        "239",
+        0
+      ]
+    },
+    "class_type": "JoinStringMulti",
+    "_meta": {
+      "title": "Join String Multi"
+    }
+  },
+  "238": {
+    "inputs": {
+      "value": "Blondy"
+    },
+    "class_type": "PrimitiveString",
+    "_meta": {
+      "title": "Set Character's First Name"
+    }
+  },
+  "239": {
+    "inputs": {
+      "value": "Nobody"
+    },
+    "class_type": "PrimitiveString",
+    "_meta": {
+      "title": "Set Character's Last Name"
+    }
+  },
+  "246": {
+    "inputs": {
+      "UNKNOWN": "FLUX.2/flux-2-klein-4b-Q8_0.gguf"
+    },
+    "_meta": {}
+  },
+  "251": {
+    "inputs": {
+      "conditioning": [
+        "252",
+        0
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "252": {
     "inputs": {
       "text": "{{POSITIVE_PROMPT}}",
-      "clip": ["1", 1]
-    }
-  },
-  "3": {
+      "clip": [
+        "255",
+        0
+      ]
+    },
     "class_type": "CLIPTextEncode",
-    "inputs": {
-      "text": "{{NEGATIVE_PROMPT}}",
-      "clip": ["1", 1]
+    "_meta": {
+      "title": "Pass Text"
     }
   },
-  "4": {
-    "class_type": "LoraLoader",
+  "255": {
     "inputs": {
-      "model": ["1", 0],
-      "clip": ["1", 1],
-      "lora_name": "instapic_ultrareal.safetensors",
-      "strength_model": 0.7,
-      "strength_clip": 0.7
+      "clip_name": "FLUX.2/qwen_3_4b.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
     }
   },
-  "5": {
-    "class_type": "LoraLoader",
+  "256": {
     "inputs": {
-      "model": ["4", 0],
-      "clip": ["4", 1],
-      "lora_name": "ultra_real_klein_9b.safetensors",
-      "strength_model": 0.4,
-      "strength_clip": 0.4
+      "width": [
+        "262",
+        0
+      ],
+      "height": [
+        "262",
+        1
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyFlux2LatentImage",
+    "_meta": {
+      "title": "Empty Flux 2 Latent"
     }
   },
-  "6": {
-    "class_type": "EmptyLatentImage",
+  "257": {
+    "inputs": {
+      "noise_seed": 1107201396358852
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "258": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "81",
+        0
+      ],
+      "positive": [
+        "266:264",
+        0
+      ],
+      "negative": [
+        "266:265",
+        0
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFGGuider"
+    }
+  },
+  "259": {
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "260": {
+    "inputs": {
+      "steps": 4,
+      "width": [
+        "262",
+        0
+      ],
+      "height": [
+        "262",
+        1
+      ]
+    },
+    "class_type": "Flux2Scheduler",
+    "_meta": {
+      "title": "Flux2Scheduler"
+    }
+  },
+  "261": {
+    "inputs": {
+      "noise": [
+        "257",
+        0
+      ],
+      "guider": [
+        "258",
+        0
+      ],
+      "sampler": [
+        "259",
+        0
+      ],
+      "sigmas": [
+        "260",
+        0
+      ],
+      "latent_image": [
+        "256",
+        0
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "262": {
     "inputs": {
       "width": 832,
-      "height": 1216,
-      "batch_size": 1
+      "height": 1216
+    },
+    "class_type": "SetImageSize",
+    "_meta": {
+      "title": "SetImageSize"
     }
   },
-  "7": {
-    "class_type": "KSampler",
+  "263": {
     "inputs": {
-      "model": ["5", 0],
-      "positive": ["2", 0],
-      "negative": ["3", 0],
-      "latent_image": ["6", 0],
-      "seed": 0,
-      "steps": 20,
-      "cfg": 3.5,
-      "sampler_name": "euler",
-      "scheduler": "simple",
-      "denoise": 1.0
+      "upscale_method": "nearest-exact",
+      "megapixels": 1,
+      "resolution_steps": 1,
+      "image": [
+        "166",
+        0
+      ]
+    },
+    "class_type": "ImageScaleToTotalPixels",
+    "_meta": {
+      "title": "ImageScaleToTotalPixels"
     }
   },
-  "8": {
-    "class_type": "VAEDecode",
+  "266:204": {
     "inputs": {
-      "samples": ["7", 0],
-      "vae": ["1", 2]
+      "pixels": [
+        "263",
+        0
+      ],
+      "vae": [
+        "123",
+        0
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
     }
   },
-  "9": {
-    "class_type": "SaveImage",
+  "266:264": {
     "inputs": {
-      "images": ["8", 0],
-      "filename_prefix": "dataset"
+      "conditioning": [
+        "252",
+        0
+      ],
+      "latent": [
+        "266:204",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
+    }
+  },
+  "266:265": {
+    "inputs": {
+      "conditioning": [
+        "251",
+        0
+      ],
+      "latent": [
+        "266:204",
+        0
+      ]
+    },
+    "class_type": "ReferenceLatent",
+    "_meta": {
+      "title": "ReferenceLatent"
     }
   }
 }

@@ -66,7 +66,7 @@ image = (
         # Install ComfyUI
         f"comfy --skip-prompt install --fast-deps --nvidia --version 0.3.40 "
         f"--install-path {COMFYUI_DIR}",
-        # Custom nodes needed for the realism stack
+        # Custom nodes required by the CCDB workflow
         f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
         f"https://github.com/ltdrdata/ComfyUI-Manager",
         f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
@@ -74,7 +74,11 @@ image = (
         f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
         f"https://github.com/Gourieff/comfyui-reactor-node",  # face enhancement
         f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/city96/ComfyUI-GGUF",  # GGUF model loader
+        f"https://github.com/city96/ComfyUI-GGUF",  # UnetLoaderGGUF
+        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
+        f"https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes",  # JoinStringMulti, SetImageSize
+        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
+        f"https://github.com/alexopus/comfyui-image-saver",  # Image Saver Simple
     )
 )
 
@@ -85,24 +89,18 @@ app = modal.App("ai-studio-comfyui", image=image)
 # ---------------------------------------------------------------------------
 
 MODELS = {
-    # Flux.2 Klein 4B GGUF — fast, realistic baseline
-    "unet/flux2-klein-4b-Q8_0.gguf": (
-        "https://huggingface.co/city96/FLUX.2-dev-gguf/resolve/main/"
-        "flux2-dev-Q8_0.gguf"
+    # Paths match what the CCDB workflow JSON references (FLUX.2/ subdirectory)
+    "FLUX.2/flux-2-klein-4b-Q8_0.gguf": (
+        "https://huggingface.co/unsloth/FLUX.2-klein-4B-GGUF/resolve/main/"
+        "flux-2-klein-4b-Q8_0.gguf"
     ),
-    # Text encoders (shared with Flux 1)
-    "clip/clip_l.safetensors": (
-        "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/"
-        "clip_l.safetensors"
+    "FLUX.2/qwen_3_4b.safetensors": (
+        "https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/"
+        "split_files/text_encoders/qwen_3_4b.safetensors"
     ),
-    "clip/t5xxl_fp8_e4m3fn.safetensors": (
-        "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/"
-        "t5xxl_fp8_e4m3fn.safetensors"
-    ),
-    # VAE
-    "vae/ae.safetensors": (
-        "https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/"
-        "ae.safetensors"
+    "FLUX.2/flux2-vae.safetensors": (
+        "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/"
+        "split_files/vae/flux2-vae.safetensors"
     ),
 }
 
@@ -175,6 +173,29 @@ def _start_comfyui() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _upload_image_to_comfyui(base_url: str, filename: str, data: bytes) -> None:
+    """Upload an image to ComfyUI's input folder via the /upload/image endpoint."""
+    import urllib.request as _req
+
+    boundary = "comfyupload"
+    body = (
+        f"--{boundary}\r\n"
+        f'Content-Disposition: form-data; name="image"; filename="{filename}"\r\n'
+        f"Content-Type: image/jpeg\r\n\r\n"
+    ).encode() + data + f"\r\n--{boundary}--\r\n".encode()
+    req = _req.Request(
+        f"{base_url}/upload/image",
+        data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+    )
+    _req.urlopen(req)
+
+
+# ---------------------------------------------------------------------------
 # Main inference endpoint
 # ---------------------------------------------------------------------------
 
@@ -196,6 +217,7 @@ class ComfyUIRunner:
         self,
         workflow: dict[str, Any],
         output_node_ids: list[str] | None = None,
+        input_images: dict[str, bytes] | None = None,
     ) -> list[bytes]:
         """Submit a ComfyUI API-format workflow and return output images as bytes.
 
@@ -203,9 +225,14 @@ class ComfyUIRunner:
             workflow: ComfyUI API-format dict (the JSON you'd POST to /prompt).
             output_node_ids: node IDs whose outputs to collect. If None, collects
                              all nodes whose class_type is 'SaveImage' or 'PreviewImage'.
+            input_images: mapping of filename → bytes to upload before running (for LoadImage nodes).
         """
         import json as _json
         import urllib.request as _req
+
+        if input_images:
+            for filename, data in input_images.items():
+                _upload_image_to_comfyui(self._base, filename, data)
 
         client_id = "modal-runner"
         payload = _json.dumps({"prompt": workflow, "client_id": client_id}).encode()

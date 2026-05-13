@@ -26,6 +26,7 @@ class Persona(BaseModel):
     name: str
     niche: str
     status: str
+    reference_image: str | None = None
     face: FaceConfig
     pulid: PulidConfig = PulidConfig()
     voice: VoiceConfig
