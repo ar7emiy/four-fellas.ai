@@ -14,22 +14,25 @@ face:
     blurry, ugly, duplicate, watermark, text
   candidate_count: 20
   aspect_ratio: "9:16"
+  # Phase 0 dataset prompts — teach the LoRA Riley's face identity, not a lifestyle.
+  # Diverse poses, angles, lighting, casual outfits. No activity-specific context.
+  # Phase 1 inference adds the golf/lifestyle prompts on top of the trained LoRA.
   ccdb_prompts:
-    - "subject facing the camera directly, front view."
-    - "subject seen from behind, back view."
-    - "subject seen from the left side, profile view."
-    - "subject seen from the right side, profile view."
-    - "close-up of subject's face, front view."
-    - "Make this person walk along a golf course fairway at golden hour, athletic wear, sun behind them, 35mm lens at f/2.8."
-    - "Make this person swing a golf club mid-follow-through, athletic polo and shorts, dynamic low angle, 85mm lens at f/2.0."
-    - "Make this person sit in a golf cart laughing, sunglasses on, casual polo, shot from the side, 50mm lens at f/2.2."
-    - "Make this person crouch to read a putt on a green, intense focus, 85mm lens at f/1.8, late afternoon light."
-    - "Make this person hold a golf club over their shoulder walking toward the camera, confident smile, 35mm lens at f/2.8."
-    - "Make this person at a 19th hole bar, casual sundress, cocktail in hand, warm indoor lighting, 50mm lens at f/1.8."
-    - "Make this person stretching before a round on a driving range, athletic wear, morning light, 35mm lens at f/4.0."
-    - "Make this person looking out over a scenic golf course from a hilltop, wind in hair, 85mm lens at f/2.0."
-    - "Make this person laugh with friends on a golf course, relaxed group setting, candid style, 35mm lens at f/2.8."
-    - "Make this person at a luxury resort pool in a swimsuit, sun-kissed skin, relaxed pose, 50mm lens at f/2.0."
+    - "subject facing the camera directly, neutral expression, soft natural light, front view."
+    - "subject seen from the left side, profile view, outdoor daylight."
+    - "subject seen from the right side, profile view, outdoor daylight."
+    - "close-up of subject's face, slight smile, front view, sharp focus on eyes."
+    - "subject looking slightly off-camera, candid expression, 85mm lens at f/1.8."
+    - "Make this person stand in soft window light indoors, casual white t-shirt, relaxed posture, 50mm lens at f/2.0."
+    - "Make this person sit at a cafe table, casual outfit, natural expression, 50mm lens at f/2.2."
+    - "Make this person walk toward the camera on a city street, casual jeans and top, bright daylight, 35mm lens at f/2.8."
+    - "Make this person laugh naturally, head tilted slightly, outdoor setting, 85mm lens at f/1.8."
+    - "Make this person look over their shoulder at the camera, half-turn pose, outdoor golden hour light, 85mm lens at f/2.0."
+    - "Make this person sit on steps outside, relaxed casual outfit, looking directly at camera, 35mm lens at f/2.8."
+    - "Make this person stand in shade on a sunny day, dappled light on face, simple outfit, 50mm lens at f/2.5."
+    - "Make this person with wet hair after a shower, minimal makeup, natural skin, close crop, 85mm lens at f/1.4."
+    - "Make this person at a rooftop at dusk, city lights behind, casual dress, 50mm lens at f/1.8."
+    - "Make this person lying in grass in a park, looking up at camera from below, casual outfit, 35mm lens at f/2.8."
 
 pulid:
   reference_strength: 0.8
