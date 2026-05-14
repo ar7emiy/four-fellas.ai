@@ -15,7 +15,7 @@ The CCDB workflow achieves dataset consistency via **reference image conditionin
 - [x] Fix workflow prompt injection: replace broken node 254 (`UNKNOWN`) with a plain `CLIPTextEncode` using `{{POSITIVE_PROMPT}}`
 - [x] Add `reference_image` field to `riley.yaml` and `Persona` dataclass
 - [x] Update `cli.py` to inject reference image path into workflow node 166 (`LoadImage`) and character name into nodes 238/239
-- [ ] Copy reference image → `data/personas/riley/reference.jpeg` (manual: copy `Character Base.jpeg` from Civitai download)
+- [x] Copy reference image → `data/personas/riley/reference.jpeg` (using `candidate_002.jpg` from Stage 1 fal.ai generation)
 - [ ] One-time Modal setup: `modal deploy infra/modal_app.py` + `modal run infra/modal_app.py::download_models`
 - [ ] Pre-load realism LoRAs to Modal volume for Phase 1: `studio upload-lora ultra_real_v4.safetensors --name instapic_ultrareal.safetensors` and `studio upload-lora V1_flux_klein.safetensors --name ultra_real_klein_9b.safetensors`
 - [ ] Generate 80 candidates: `studio dataset-build riley --count 80`
