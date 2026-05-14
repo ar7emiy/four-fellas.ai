@@ -1,7 +1,7 @@
 {
   "123": {
     "inputs": {
-      "vae_name": "FLUX.2/flux2-vae.safetensors"
+      "vae_name": "flux2-vae.safetensors"
     },
     "class_type": "VAELoader",
     "_meta": {

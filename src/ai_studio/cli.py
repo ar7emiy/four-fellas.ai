@@ -91,7 +91,7 @@ def dataset_build(
     client = ComfyUIClient(local_url="http://localhost:8188" if local else None)
 
     typer.echo(
-        f"Running dataset build for '{persona}' → {output_dir}\n"
+        f"Running dataset build for '{persona}' -> {output_dir}\n"
         f"  workflow: {workflow}\n"
         f"  reference: {ref_path}\n"
         f"  count: {count}\n"

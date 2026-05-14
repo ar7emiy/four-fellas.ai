@@ -82,16 +82,18 @@ app = modal.App("ai-studio-comfyui", image=image)
 # ---------------------------------------------------------------------------
 
 MODELS = {
-    # Paths match what the CCDB workflow JSON references (FLUX.2/ subdirectory)
-    "FLUX.2/flux-2-klein-4b-Q8_0.gguf": (
+    # ComfyUI standard subdirs: unet/, text_encoders/, vae/
+    # Workflow nodes reference these as "FLUX.2/<filename>" which ComfyUI
+    # resolves relative to each type's root folder.
+    "unet/FLUX.2/flux-2-klein-4b-Q8_0.gguf": (
         "https://huggingface.co/unsloth/FLUX.2-klein-4B-GGUF/resolve/main/"
         "flux-2-klein-4b-Q8_0.gguf"
     ),
-    "FLUX.2/qwen_3_4b.safetensors": (
+    "text_encoders/FLUX.2/qwen_3_4b.safetensors": (
         "https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/"
         "split_files/text_encoders/qwen_3_4b.safetensors"
     ),
-    "FLUX.2/flux2-vae.safetensors": (
+    "vae/flux2-vae.safetensors": (
         "https://huggingface.co/Comfy-Org/flux2-dev/resolve/main/"
         "split_files/vae/flux2-vae.safetensors"
     ),
