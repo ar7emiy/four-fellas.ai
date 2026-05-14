@@ -11,6 +11,7 @@ class FaceConfig(BaseModel):
     negative_prompt: str = ""
     candidate_count: int = 20
     aspect_ratio: str = "9:16"
+    ccdb_prompts: list[str] | None = None
 
 
 class PulidConfig(BaseModel):

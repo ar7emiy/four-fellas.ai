@@ -40,9 +40,9 @@ class ComfyUIClient:
 
         output_dir.mkdir(parents=True, exist_ok=True)
         saved: list[Path] = []
-        for i, img_bytes in enumerate(images):
+        for img_bytes in images:
             ext = _sniff_ext(img_bytes)
-            path = output_dir / f"{filename_prefix}_{i + 1:03d}{ext}"
+            path = output_dir / f"{filename_prefix}{ext}"
             path.write_bytes(img_bytes)
             saved.append(path)
         return saved

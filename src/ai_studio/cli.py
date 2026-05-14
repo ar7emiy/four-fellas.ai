@@ -85,8 +85,7 @@ def dataset_build(
     ref_bytes = ref_path.read_bytes()
 
     raw = _json.loads(workflow.read_text())
-    wf = _inject_persona_prompt(raw, p.face.base_prompt, p.face.negative_prompt)
-    wf = _inject_persona_runtime(wf, ref_filename)
+    base_wf = _inject_persona_runtime(raw, ref_filename)
 
     client = ComfyUIClient(local_url="http://localhost:8188" if local else None)
 
@@ -101,13 +100,16 @@ def dataset_build(
     import random as _random
 
     all_saved: list[Path] = []
+    prompts = p.face.ccdb_prompts or [p.face.base_prompt]
     for i in range(count):
+        prompt = prompts[i % len(prompts)]
+        wf = _inject_persona_prompt(base_wf, prompt, p.face.negative_prompt)
         typer.echo(f"  [{i + 1}/{count}] generating...", nl=False)
         wf["257"]["inputs"]["noise_seed"] = _random.randint(0, 2**32 - 1)
         saved = client.run_workflow(
             workflow=wf,
             output_dir=output_dir,
-            filename_prefix="candidate",
+            filename_prefix=f"candidate_{i + 1:03d}",
             input_images={ref_filename: ref_bytes},
         )
         all_saved.extend(saved)

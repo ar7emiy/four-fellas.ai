@@ -14,6 +14,22 @@ face:
     blurry, ugly, duplicate, watermark, text
   candidate_count: 20
   aspect_ratio: "9:16"
+  ccdb_prompts:
+    - "subject facing the camera directly, front view."
+    - "subject seen from behind, back view."
+    - "subject seen from the left side, profile view."
+    - "subject seen from the right side, profile view."
+    - "close-up of subject's face, front view."
+    - "Make this person walk along a golf course fairway at golden hour, athletic wear, sun behind them, 35mm lens at f/2.8."
+    - "Make this person swing a golf club mid-follow-through, athletic polo and shorts, dynamic low angle, 85mm lens at f/2.0."
+    - "Make this person sit in a golf cart laughing, sunglasses on, casual polo, shot from the side, 50mm lens at f/2.2."
+    - "Make this person crouch to read a putt on a green, intense focus, 85mm lens at f/1.8, late afternoon light."
+    - "Make this person hold a golf club over their shoulder walking toward the camera, confident smile, 35mm lens at f/2.8."
+    - "Make this person at a 19th hole bar, casual sundress, cocktail in hand, warm indoor lighting, 50mm lens at f/1.8."
+    - "Make this person stretching before a round on a driving range, athletic wear, morning light, 35mm lens at f/4.0."
+    - "Make this person looking out over a scenic golf course from a hilltop, wind in hair, 85mm lens at f/2.0."
+    - "Make this person laugh with friends on a golf course, relaxed group setting, candid style, 35mm lens at f/2.8."
+    - "Make this person at a luxury resort pool in a swimsuit, sun-kissed skin, relaxed pose, 50mm lens at f/2.0."
 
 pulid:
   reference_strength: 0.8
