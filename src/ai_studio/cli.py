@@ -99,8 +99,13 @@ def dataset_build(
 
     import random as _random
 
+    prompts_file = Path("data/personas") / persona / "ccdb_prompts.txt"
+    if prompts_file.exists():
+        prompts = [l.strip() for l in prompts_file.read_text().splitlines() if l.strip()]
+    else:
+        prompts = p.face.ccdb_prompts or [p.face.base_prompt]
+
     all_saved: list[Path] = []
-    prompts = p.face.ccdb_prompts or [p.face.base_prompt]
     for i in range(count):
         prompt = prompts[i % len(prompts)]
         wf = _inject_persona_prompt(base_wf, prompt, p.face.negative_prompt)
