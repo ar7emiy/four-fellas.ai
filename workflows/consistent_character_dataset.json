@@ -93,14 +93,8 @@
   },
   "256": {
     "inputs": {
-      "width": [
-        "262",
-        0
-      ],
-      "height": [
-        "262",
-        1
-      ],
+      "width": 832,
+      "height": 1216,
       "batch_size": 1
     },
     "class_type": "EmptyFlux2LatentImage",
@@ -150,14 +144,8 @@
   "260": {
     "inputs": {
       "steps": 4,
-      "width": [
-        "262",
-        0
-      ],
-      "height": [
-        "262",
-        1
-      ]
+      "width": 832,
+      "height": 1216
     },
     "class_type": "Flux2Scheduler",
     "_meta": {
@@ -190,16 +178,6 @@
     "class_type": "SamplerCustomAdvanced",
     "_meta": {
       "title": "SamplerCustomAdvanced"
-    }
-  },
-  "262": {
-    "inputs": {
-      "width": 832,
-      "height": 1216
-    },
-    "class_type": "SetImageSize",
-    "_meta": {
-      "title": "SetImageSize"
     }
   },
   "263": {
