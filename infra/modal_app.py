@@ -64,21 +64,14 @@ image = (
     )
     .run_commands(
         # Install ComfyUI
-        f"comfy --skip-prompt install --fast-deps --nvidia --version 0.3.40 "
-        f"--install-path {COMFYUI_DIR}",
+        f"comfy --skip-prompt --workspace={COMFYUI_DIR} install --fast-deps --nvidia --version 0.3.40",
         # Custom nodes required by the CCDB workflow
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/ltdrdata/ComfyUI-Manager",
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/ltdrdata/ComfyUI-Impact-Pack",  # Face Detailer
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/Gourieff/comfyui-reactor-node",  # face enhancement
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/city96/ComfyUI-GGUF",  # UnetLoaderGGUF
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes",  # JoinStringMulti, SetImageSize
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} custom-node install "
-        f"https://github.com/alexopus/comfyui-image-saver",  # Image Saver Simple
+        f"git clone https://github.com/city96/ComfyUI-GGUF {COMFYUI_DIR}/custom_nodes/ComfyUI-GGUF",
+        f"git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes {COMFYUI_DIR}/custom_nodes/ComfyUI_Comfyroll_CustomNodes",
+        f"git clone https://github.com/alexopus/comfyui-image-saver {COMFYUI_DIR}/custom_nodes/comfyui-image-saver",
+        f"pip install gguf",  # required by ComfyUI-GGUF
+        # Clear the models dir so Modal can mount the volume there
+        f"rm -rf {COMFYUI_DIR}/models",
     )
 )
 
@@ -200,11 +193,11 @@ def _upload_image_to_comfyui(base_url: str, filename: str, data: bytes) -> None:
 # ---------------------------------------------------------------------------
 
 @app.cls(
-    gpu=modal.gpu.L4(),
+    gpu="L4",
     volumes={str(COMFYUI_DIR / "models"): model_volume},
     timeout=600,
     # Keep 1 container warm for 5 min to amortise cold starts across a batch
-    container_idle_timeout=300,
+    scaledown_window=300,
 )
 class ComfyUIRunner:
     @modal.enter()
