@@ -236,7 +236,14 @@ class ComfyUIRunner:
             data=payload,
             headers={"Content-Type": "application/json"},
         )
-        resp = _req.urlopen(req)
+        try:
+            resp = _req.urlopen(req)
+        except Exception as e:
+            import urllib.error as _err
+            if isinstance(e, _err.HTTPError):
+                body = e.read().decode("utf-8", errors="replace")
+                raise RuntimeError(f"ComfyUI /prompt rejected workflow (HTTP {e.code}): {body}") from None
+            raise
         prompt_id = _json.loads(resp.read())["prompt_id"]
 
         # Poll until done
