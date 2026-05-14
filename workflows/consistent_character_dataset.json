@@ -1,16 +1,4 @@
 {
-  "81": {
-    "inputs": {
-      "model": [
-        "246",
-        0
-      ]
-    },
-    "class_type": "ModelPassThrough",
-    "_meta": {
-      "title": "ModelPass"
-    }
-  },
   "123": {
     "inputs": {
       "vae_name": "FLUX.2/flux2-vae.safetensors"
@@ -56,44 +44,6 @@
     "class_type": "SaveImage",
     "_meta": {
       "title": "Save Image"
-    }
-  },
-  "236": {
-    "inputs": {
-      "inputcount": 2,
-      "delimiter": "_",
-      "return_list": false,
-      "Update inputs": null,
-      "string_1": [
-        "238",
-        0
-      ],
-      "string_2": [
-        "239",
-        0
-      ]
-    },
-    "class_type": "JoinStringMulti",
-    "_meta": {
-      "title": "Join String Multi"
-    }
-  },
-  "238": {
-    "inputs": {
-      "value": "Blondy"
-    },
-    "class_type": "PrimitiveString",
-    "_meta": {
-      "title": "Set Character's First Name"
-    }
-  },
-  "239": {
-    "inputs": {
-      "value": "Nobody"
-    },
-    "class_type": "PrimitiveString",
-    "_meta": {
-      "title": "Set Character's Last Name"
     }
   },
   "246": {
@@ -171,7 +121,7 @@
     "inputs": {
       "cfg": 1,
       "model": [
-        "81",
+        "246",
         0
       ],
       "positive": [

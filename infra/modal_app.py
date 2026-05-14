@@ -63,12 +63,12 @@ image = (
         "soundfile",
     )
     .run_commands(
-        # Install ComfyUI
-        f"comfy --skip-prompt --workspace={COMFYUI_DIR} install --fast-deps --nvidia --version 0.3.40",
-        # Custom nodes required by the CCDB workflow
+        # Install latest ComfyUI — version 0.3.40 predates Flux.2 Klein nodes
+        f"comfy --skip-prompt --workspace={COMFYUI_DIR} install --fast-deps --nvidia",
+        # ComfyUI-GGUF provides UnetLoaderGGUF, ReferenceLatent, Flux2Scheduler,
+        # EmptyFlux2LatentImage — all required by the CCDB workflow
         f"git clone https://github.com/city96/ComfyUI-GGUF {COMFYUI_DIR}/custom_nodes/ComfyUI-GGUF",
         f"git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes {COMFYUI_DIR}/custom_nodes/ComfyUI_Comfyroll_CustomNodes",
-        f"git clone https://github.com/alexopus/comfyui-image-saver {COMFYUI_DIR}/custom_nodes/comfyui-image-saver",
         f"pip install gguf",  # required by ComfyUI-GGUF
         # Clear the models dir so Modal can mount the volume there
         f"rm -rf {COMFYUI_DIR}/models",

@@ -86,7 +86,7 @@ def dataset_build(
 
     raw = _json.loads(workflow.read_text())
     wf = _inject_persona_prompt(raw, p.face.base_prompt, p.face.negative_prompt)
-    wf = _inject_persona_runtime(wf, ref_filename, p.name.capitalize(), "")
+    wf = _inject_persona_runtime(wf, ref_filename)
 
     client = ComfyUIClient(local_url="http://localhost:8188" if local else None)
 
@@ -98,9 +98,12 @@ def dataset_build(
         f"  backend: {'local' if local else 'Modal L4'}"
     )
 
+    import random as _random
+
     all_saved: list[Path] = []
     for i in range(count):
         typer.echo(f"  [{i + 1}/{count}] generating...", nl=False)
+        wf["257"]["inputs"]["noise_seed"] = _random.randint(0, 2**32 - 1)
         saved = client.run_workflow(
             workflow=wf,
             output_dir=output_dir,
@@ -140,24 +143,16 @@ def _inject_persona_prompt(
 def _inject_persona_runtime(
     workflow: dict,
     reference_image_filename: str,
-    first_name: str,
-    last_name: str,
 ) -> dict:
     """Inject runtime values into CCDB workflow nodes.
 
     Node 166 (LoadImage): reference face filename.
-    Node 238 (PrimitiveString): character first name → output filename prefix.
-    Node 239 (PrimitiveString): character last name → output filename suffix.
     """
     import copy
 
     wf = copy.deepcopy(workflow)
     if "166" in wf:
         wf["166"]["inputs"]["image"] = reference_image_filename
-    if "238" in wf:
-        wf["238"]["inputs"]["value"] = first_name
-    if "239" in wf:
-        wf["239"]["inputs"]["value"] = last_name
     return wf
 
 
