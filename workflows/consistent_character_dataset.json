@@ -47,22 +47,15 @@
   },
   "228": {
     "inputs": {
-      "UNKNOWN": true,
       "images": [
         "145",
         0
       ],
-      "path": [
-        "236",
-        0
-      ]
+      "filename_prefix": "dataset"
     },
-    "_meta": {}
-  },
-  "232": {
-    "inputs": {},
+    "class_type": "SaveImage",
     "_meta": {
-      "title": "Flux.2 Klein 4B Simple Consistent Character Dataset Builder"
+      "title": "Save Image"
     }
   },
   "236": {
@@ -105,9 +98,12 @@
   },
   "246": {
     "inputs": {
-      "UNKNOWN": "FLUX.2/flux-2-klein-4b-Q8_0.gguf"
+      "unet_name": "FLUX.2/flux-2-klein-4b-Q8_0.gguf"
     },
-    "_meta": {}
+    "class_type": "UnetLoaderGGUF",
+    "_meta": {
+      "title": "Load GGUF Unet"
+    }
   },
   "251": {
     "inputs": {
