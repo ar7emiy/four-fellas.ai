@@ -29,6 +29,8 @@ env/
 # Project-local data (gitignored per plan)
 data/reference/
 data/outputs/
+!data/outputs/*/dataset_candidates/
+!data/outputs/*/culled/
 output/
 
 # Legacy (archived project tokens)
